@@ -17,20 +17,23 @@ import java.time.Instant;
 @NoArgsConstructor
 @Table(name = "message_reactions")
 public class MessageReaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @ManyToOne (fetch = FetchType.LAZY)
-    @JoinColumn (name="message_id")
+    @EmbeddedId
+    private MessageReactionId id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("messageId")
+    @JoinColumn(name = "message_id")
     private Message message;
 
-    @ManyToOne (fetch = FetchType.LAZY)
-    @JoinColumn (name="user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     private ReactionEnum reactionType;
     private Instant createdAt;
+
     @PrePersist
     public void handleBeforeCreated() {
         this.createdAt = Instant.now();

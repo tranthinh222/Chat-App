@@ -2,6 +2,7 @@ package com.thinhtran.chatapp.domain;
 
 import com.thinhtran.chatapp.util.SecurityUtil;
 import com.thinhtran.chatapp.util.constant.MessageTypeEnum;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,6 +32,7 @@ public class Message {
 
     private MessageTypeEnum messageType;
     @Column(columnDefinition = "MEDIUMTEXT")
+    @Nullable
     private String content;
 
     private Instant createdAt;

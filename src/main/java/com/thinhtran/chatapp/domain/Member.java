@@ -15,7 +15,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "conversation_members")
+@Table(name = "members")
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +28,8 @@ public class Member {
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn (name="user_id")
     private User user;
+
+    @Enumerated(EnumType.STRING)
     private RoleMemberEnum role;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")

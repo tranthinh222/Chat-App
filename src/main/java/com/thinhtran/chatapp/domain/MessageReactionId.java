@@ -1,0 +1,17 @@
+package com.thinhtran.chatapp.domain;
+
+import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+
+@Embeddable
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class MessageReactionId implements Serializable {
+    private Long messageId;
+    private Long userId;
+}
