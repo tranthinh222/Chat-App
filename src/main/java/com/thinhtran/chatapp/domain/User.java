@@ -4,8 +4,6 @@ package com.thinhtran.chatapp.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.thinhtran.chatapp.util.SecurityUtil;
 import com.thinhtran.chatapp.util.constant.GenderEnum;
-import com.thinhtran.chatapp.util.constant.RoleEnum;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,9 +34,6 @@ public class User {
     private String phone;
     @Enumerated(EnumType.STRING)
     private GenderEnum gender;
-
-    @Enumerated(EnumType.STRING)
-    private RoleEnum role;
 
     private String avatar;
     @Column(columnDefinition = "MEDIUMTEXT")

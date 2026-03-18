@@ -1,13 +1,13 @@
 package com.thinhtran.chatapp.controller;
 
 import com.thinhtran.chatapp.domain.Conversation;
+import com.thinhtran.chatapp.domain.request.ReqCreateConversationDto;
+import com.thinhtran.chatapp.domain.response.ResConversationDto;
 import com.thinhtran.chatapp.service.ConversationService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1")
@@ -19,5 +19,10 @@ public class ConversationController {
     @GetMapping("/conversation/{id}")
     public ResponseEntity<Conversation> fetchConversationById(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(this.conversationService.getUserById(id));
+    }
+
+    @PostMapping("/conversation")
+    public ResponseEntity<ResConversationDto> createConversation(@Valid @RequestBody ReqCreateConversationDto reqCreateConversationDto){
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.conversationService.createConversation(reqCreateConversationDto));
     }
 }

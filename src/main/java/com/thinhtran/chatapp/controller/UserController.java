@@ -32,6 +32,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToResUserDTO(user));
     }
 
+    @GetMapping("/users/{phone_number}")
+    @ApiMessage("fetch user by phone number")
+    public ResponseEntity<ResUserDto> getUserByPhone(@PathVariable("phone_number") String phoneNumber){
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.getUserByPhoneNumber(phoneNumber));
+    }
+
     @PostMapping("/users/")
     @ApiMessage("create an user")
     public ResponseEntity<User> createUser(@RequestBody ReqCreateUserDto user)throws Exception {

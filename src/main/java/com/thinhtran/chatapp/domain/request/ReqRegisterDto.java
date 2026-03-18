@@ -1,7 +1,6 @@
 package com.thinhtran.chatapp.domain.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.thinhtran.chatapp.util.constant.RoleEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.PrePersist;
@@ -26,9 +25,6 @@ public class ReqRegisterDto {
     private String username;
 
     private String phone;
-
-    @Enumerated(EnumType.STRING)
-    private RoleEnum role = RoleEnum.USER;
 
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")

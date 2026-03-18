@@ -15,4 +15,5 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
     User findByResetToken(String resetToken);
 
     User findUserById(Long id);
+    User findUserByPhone(String phone_number);
 }

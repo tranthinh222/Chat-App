@@ -46,7 +46,6 @@ public class SecurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(email)
-                .claim("roles", List.of("ROLE_" + dto.getUser().getRole().name()))
                 .claim("user", dto.getUser())
                 .build();
 

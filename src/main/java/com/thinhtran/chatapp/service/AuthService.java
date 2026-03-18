@@ -70,8 +70,7 @@ public class AuthService {
 
         if (currentUserDB != null) {
             jwtUser = new ResUserJwtDto(currentUserDB.getId(), currentUserDB.getUsername(), currentUserDB.getEmail(),
-                    currentUserDB.getPhone(), currentUserDB.getGender(), currentUserDB.getAvatar(),
-                    currentUserDB.getRole());
+                    currentUserDB.getPhone(), currentUserDB.getGender(), currentUserDB.getAvatar());
             response.setUser(jwtUser);
         }
 
@@ -99,13 +98,12 @@ public class AuthService {
                 .username(reqRegisterDto.getUsername())
                 .email(reqRegisterDto.getEmail())
                 .password(hashPassword)
-                .role(reqRegisterDto.getRole())
                 .phone(reqRegisterDto.getPhone())
                 .build();
 
         userService.registerUser(registerUser);
         ResUserDto response = new ResUserDto(registerUser.getId(), registerUser.getUsername(),
-                registerUser.getEmail(), registerUser.getPhone(), registerUser.getRole(),
+                registerUser.getEmail(), registerUser.getPhone(),
                 registerUser.getCreatedAt(), null);
 
         return response;
@@ -118,8 +116,7 @@ public class AuthService {
         User currentUserDB = this.userService.getUserByEmail(email);
         if (currentUserDB != null) {
             jwtUser = new ResUserJwtDto(currentUserDB.getId(), currentUserDB.getUsername(), currentUserDB.getEmail(),
-                    currentUserDB.getPhone(), currentUserDB.getGender(), currentUserDB.getAvatar(),
-                    currentUserDB.getRole());
+                    currentUserDB.getPhone(), currentUserDB.getGender(), currentUserDB.getAvatar());
         }
 
         return jwtUser;
@@ -143,8 +140,7 @@ public class AuthService {
         ResUserJwtDto jwtUser = null;
         if (currentUserDB != null) {
             jwtUser = new ResUserJwtDto(currentUserDB.getId(), currentUserDB.getUsername(), currentUserDB.getEmail(),
-                    currentUserDB.getPhone(), currentUserDB.getGender(), currentUserDB.getAvatar(),
-                    currentUserDB.getRole());
+                    currentUserDB.getPhone(), currentUserDB.getGender(), currentUserDB.getAvatar());
             response.setUser(jwtUser);
         }
 

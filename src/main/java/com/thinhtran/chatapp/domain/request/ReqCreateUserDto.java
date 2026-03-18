@@ -1,6 +1,5 @@
 package com.thinhtran.chatapp.domain.request;
 
-import com.thinhtran.chatapp.util.constant.RoleEnum;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -20,6 +19,5 @@ public class ReqCreateUserDto {
             message = "Invalid phone number"
     )
     private String phone;
-    private RoleEnum role;
 }
 

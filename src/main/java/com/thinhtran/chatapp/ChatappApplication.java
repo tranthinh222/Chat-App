@@ -9,7 +9,8 @@ import org.springframework.boot.security.autoconfigure.actuate.web.servlet.Manag
 public class ChatappApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ChatappApplication.class, args);
+
+        SpringApplication.run(ChatappApplication.class, args);
 	}
 
 }

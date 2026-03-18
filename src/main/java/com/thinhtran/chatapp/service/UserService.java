@@ -51,7 +51,6 @@ public class UserService {
                 item.getUsername(),
                 item.getEmail(),
                 item.getPhone(),
-                item.getRole(),
                 item.getCreatedAt(),
                 item.getUpdatedAt())).collect(Collectors.toList());
 
@@ -65,7 +64,6 @@ public class UserService {
         user.setEmail(reqUser.getEmail());
         user.setPhone(reqUser.getPhone());
         user.setPassword(reqUser.getPassword());
-        user.setRole(reqUser.getRole());
         return this.userRepository.save(user);
     }
 
@@ -79,7 +77,6 @@ public class UserService {
         resUserDto.setUsername(user.getUsername());
         resUserDto.setEmail(user.getEmail());
         resUserDto.setPhone(user.getPhone());
-        resUserDto.setRole(user.getRole());
         resUserDto.setCreatedAt(user.getCreatedAt());
         resUserDto.setUpdatedAt(user.getUpdatedAt());
         return resUserDto;
@@ -172,6 +169,19 @@ public class UserService {
 
     public User getUserByResetToken(String resetToken) {
         return this.userRepository.findByResetToken(resetToken);
+    }
+
+    public ResUserDto getUserByPhoneNumber(String phoneNumber) {
+        User user = this.userRepository.findUserByPhone(phoneNumber);
+
+        ResUserDto resUserDto = new ResUserDto();
+        resUserDto.builder().id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt()).build();
+        return resUserDto;
     }
 
 }

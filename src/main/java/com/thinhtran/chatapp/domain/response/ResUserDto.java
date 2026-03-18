@@ -1,13 +1,14 @@
 package com.thinhtran.chatapp.domain.response;
 
-import com.thinhtran.chatapp.util.constant.RoleEnum;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResUserDto {
@@ -15,7 +16,6 @@ public class ResUserDto {
     private String username;
     private String email;
     private String phone;
-    private RoleEnum role;
     private Instant createdAt;
     private Instant updatedAt;
 }

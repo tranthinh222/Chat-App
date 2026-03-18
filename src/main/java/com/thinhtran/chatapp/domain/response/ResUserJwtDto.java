@@ -1,7 +1,6 @@
 package com.thinhtran.chatapp.domain.response;
 
 import com.thinhtran.chatapp.util.constant.GenderEnum;
-import com.thinhtran.chatapp.util.constant.RoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,5 +15,4 @@ public class ResUserJwtDto {
     private String phone;
     private GenderEnum gender;
     private String avatar;
-    private RoleEnum role;
 }
