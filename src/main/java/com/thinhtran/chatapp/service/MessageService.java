@@ -1,23 +1,37 @@
 package com.thinhtran.chatapp.service;
 
-import com.thinhtran.chatapp.domain.Member;
-import com.thinhtran.chatapp.domain.Message;
-import com.thinhtran.chatapp.domain.MessageFile;
-import com.thinhtran.chatapp.domain.MessageStatus;
-import com.thinhtran.chatapp.domain.request.ReqMessageChatDto;
-import com.thinhtran.chatapp.domain.response.*;
-import com.thinhtran.chatapp.repository.*;
-import com.thinhtran.chatapp.util.constant.MessageStatusEnum;
-import com.thinhtran.chatapp.util.constant.MessageTypeEnum;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.thinhtran.chatapp.domain.Member;
+import com.thinhtran.chatapp.domain.Message;
+import com.thinhtran.chatapp.domain.MessageFile;
+import com.thinhtran.chatapp.domain.MessageStatus;
+import com.thinhtran.chatapp.domain.request.ReqMessageChatDto;
+import com.thinhtran.chatapp.domain.response.ResMessageChatDto;
+import com.thinhtran.chatapp.domain.response.ResMessageDto;
+import com.thinhtran.chatapp.domain.response.ResMessageFileDto;
+import com.thinhtran.chatapp.domain.response.ResMessageFullDto;
+import com.thinhtran.chatapp.domain.response.ResMessageReactionDetailDto;
+import com.thinhtran.chatapp.domain.response.ResMessageReactionDto;
+import com.thinhtran.chatapp.domain.response.ResSenderDto;
+import com.thinhtran.chatapp.repository.ConversationRepository;
+import com.thinhtran.chatapp.repository.MemberRepository;
+import com.thinhtran.chatapp.repository.MessageFileRepository;
+import com.thinhtran.chatapp.repository.MessageReactionRepository;
+import com.thinhtran.chatapp.repository.MessageRepository;
+import com.thinhtran.chatapp.repository.MessageStatusRepository;
+import com.thinhtran.chatapp.repository.UserRepository;
+import com.thinhtran.chatapp.util.constant.MessageStatusEnum;
+import com.thinhtran.chatapp.util.constant.MessageTypeEnum;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -28,11 +42,16 @@ public class MessageService {
     private final MessageFileRepository messageFileRepository;
     private final UserRepository userRepository;
     private final ConversationRepository conversationRepository;
-    private final MemberRepository  memberRepository;
+    private final MemberRepository memberRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
     public Long findSenderIdByMessageId(Long messageId) {
         return this.messageRepository.findSenderIdById(messageId);
+    }
+
+    public Long findConversationIdByMessageId(Long messageId) {
+        Message message = this.messageRepository.findById(messageId).orElse(null);
+        return message != null ? message.getConversation().getId() : null;
     }
 
     public Page<ResMessageFullDto> getMessages(Long conversationId, Long userId, Pageable pageable) {
@@ -67,8 +86,7 @@ public class MessageService {
         dto.setSender(new ResSenderDto(
                 msg.getUserId(),
                 msg.getUsername(),
-                msg.getAvatar()
-        ));
+                msg.getAvatar()));
 
         dto.setContent(msg.getContent());
         dto.setMessageType(msg.getMessageType());
@@ -147,8 +165,18 @@ public class MessageService {
         }
 
         createMessageStatus(message, userId);
+        ResMessageChatDto res = buildMessageChat(message, userId);
 
-        return buildMessageChat(message, userId);
+        // Broadcast to group topic - all subscribers will receive (real-time)
+        this.messagingTemplate.convertAndSend("/topic/conversations/" + dto.getConversationId(), res);
+
+        // Also send to individual queues as backup for users not subscribed
+        List<Long> memIds = this.memberRepository.findUserIdsByConversationId(dto.getConversationId());
+        for (Long memId : memIds) {
+            this.messagingTemplate.convertAndSendToUser(memId.toString(), "/queue/messages", res);
+        }
+
+        return res;
     }
 
     private void createMessageStatus(Message message, Long senderId) {
@@ -174,6 +202,7 @@ public class MessageService {
         ResMessageChatDto dto = new ResMessageChatDto();
 
         dto.setMessageId(message.getId());
+        dto.setConversationId(message.getConversation().getId());
         dto.setContent(message.getContent());
         dto.setMessageType(message.getMessageType());
         dto.setCreatedAt(message.getCreatedAt());
@@ -182,8 +211,7 @@ public class MessageService {
         dto.setSender(new ResSenderDto(
                 message.getSender().getId(),
                 message.getSender().getUsername(),
-                message.getSender().getAvatar()
-        ));
+                message.getSender().getAvatar()));
 
         // 🔥 file (vì bạn đang 1 message = 1 file)
         if (message.getMessageType() == MessageTypeEnum.FILE ||
@@ -197,8 +225,7 @@ public class MessageService {
                         file.getFileUrl(),
                         file.getFileName(),
                         file.getFileType(),
-                        file.getFileSize()
-                ));
+                        file.getFileSize()));
             }
         }
 
@@ -217,7 +244,6 @@ public class MessageService {
 
         return dto;
     }
-
 
     // handle direct message
     @Transactional
@@ -245,11 +271,21 @@ public class MessageService {
 
         createMessageStatus(message, userId);
         ResMessageChatDto res = buildMessageChat(message, userId);
-        List<Long> memIds = this.memberRepository.findUserIdsByConversationId(dto.getConversationId());
 
+        // Broadcast to group topic - all subscribers will receive (real-time)
+        this.messagingTemplate.convertAndSend("/topic/conversations/" + dto.getConversationId(), res);
+
+        // Also send to individual queues as backup for users not subscribed
+        List<Long> memIds = this.memberRepository.findUserIdsByConversationId(dto.getConversationId());
         for (Long memId : memIds) {
             this.messagingTemplate.convertAndSendToUser(memId.toString(), "/queue/messages", res);
         }
+
         return null;
+    }
+
+    @Transactional
+    public void markConversationAsRead(Long conversationId, Long userId) {
+        this.messageStatusRepository.markAllMessagesAsSeenInConversation(conversationId, userId);
     }
 }

@@ -33,7 +33,7 @@ public interface MessageReactionRepository extends JpaRepository<MessageReaction
             m.reactionType AS reactionType
         FROM MessageReaction m
         JOIN m.user u
-        WHERE m.message.id = :id
+        WHERE m.message.id IN :messageId
     """)
     List<ResMessageReactionDto> findAllByMessageIds(List<Long> messageId);
 }

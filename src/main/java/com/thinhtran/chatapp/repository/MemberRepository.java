@@ -24,5 +24,12 @@ public interface MemberRepository extends JpaRepository<Member, Long>{
     """)
     List<ResConversationMemberDto> findMemberByConversationId(Long id);
     List<Member> findByConversationId(Long conversationId);
+    
+    @Query("""
+        SELECT u.id
+        FROM Member m
+        JOIN m.user u
+        WHERE m.conversation.id = :conversationId
+    """)
     List<Long> findUserIdsByConversationId(Long conversationId);
 }
