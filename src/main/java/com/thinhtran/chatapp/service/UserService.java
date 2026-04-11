@@ -1,5 +1,15 @@
 package com.thinhtran.chatapp.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.thinhtran.chatapp.domain.User;
 import com.thinhtran.chatapp.domain.request.ReqCreateUserDto;
 import com.thinhtran.chatapp.domain.request.ReqUpdateUserDto;
@@ -8,15 +18,6 @@ import com.thinhtran.chatapp.domain.response.ResUserDto;
 import com.thinhtran.chatapp.domain.response.ResultPaginationDto;
 import com.thinhtran.chatapp.repository.UserRepository;
 import com.thinhtran.chatapp.util.error.BadRequestException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -95,24 +96,15 @@ public class UserService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
 
-            // Debug log
-            System.out.println("Before update - Phone: " + user.getPhone());
-            System.out.println("Request Phone: " + reqUser.getPhone());
-
             // Cập nhật thông tin mới
             user.setUsername(reqUser.getUsername());
             user.setPhone(reqUser.getPhone());
             user.setGender(reqUser.getGender());
             user.setAvatar(reqUser.getAvatar());
 
-            System.out.println("After setPhone - Phone: " + user.getPhone());
 
-            // Lưu vào database
             User savedUser = this.userRepository.save(user);
 
-            System.out.println("After save - Phone: " + savedUser.getPhone());
-
-            // Trả về response
             ResUpdateUserDto updatedUser = new ResUpdateUserDto();
             updatedUser.setUsername(savedUser.getUsername());
             updatedUser.setPhone(savedUser.getPhone());
@@ -182,6 +174,14 @@ public class UserService {
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt()).build();
         return resUserDto;
+    }
+
+    public void updateUserOnlineStatus(Long userId, Boolean isOnline) {
+        User user = this.getUserById(userId);
+        if (user != null) {
+            user.setIsOnline(isOnline);
+            this.userRepository.save(user);
+        }
     }
 
 }

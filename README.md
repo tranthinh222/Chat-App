@@ -301,6 +301,63 @@ Base URL: `http://localhost:8080/api`
 
 ---
 
+## 📚 API Examples
+
+### Cập nhật trạng thái online/offline qua WebSocket
+
+**STOMP Destination (Client → Server):**
+
+```
+/app/user.status
+```
+
+**Request Message:**
+
+```json
+{
+  "userId": 1,
+  "isOnline": true
+}
+```
+
+**Broadcast Destination (Server → All Clients):**
+
+```
+/topic/users
+```
+
+**Broadcast Message:**
+
+```json
+{
+  "userId": 1,
+  "isOnline": true
+}
+```
+
+**JavaScript Client Example:**
+
+```javascript
+// Send user status update
+stompClient.publish({
+  destination: "/app/user.status",
+  body: JSON.stringify({
+    userId: 1,
+    isOnline: true,
+  }),
+});
+
+// Subscribe to user status updates
+stompClient.subscribe("/topic/users", (message) => {
+  const statusUpdate = JSON.parse(message.body);
+  console.log(
+    `User ${statusUpdate.userId} is now ${statusUpdate.isOnline ? "online" : "offline"}`,
+  );
+});
+```
+
+---
+
 ## 🔄 WebSocket
 
 ### Kết nối
@@ -313,6 +370,12 @@ Gửi tin nhắn realtime:
 
 ```
 /app/chat.sendMessage
+```
+
+Cập nhật trạng thái online/offline:
+
+```
+/app/user.status
 ```
 
 Nhận tin nhắn từ conversation:

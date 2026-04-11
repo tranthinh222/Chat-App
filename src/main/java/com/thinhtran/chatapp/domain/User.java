@@ -61,6 +61,10 @@ public class User {
     @Column(columnDefinition = "MEDIUMTEXT")
     private String refreshToken;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isOnline = false;
+
     private String otpCode;
     private Instant otpExpiration;
     @Column(columnDefinition = "MEDIUMTEXT")

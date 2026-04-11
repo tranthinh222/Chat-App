@@ -7,9 +7,11 @@ import org.springframework.stereotype.Controller;
 
 import com.thinhtran.chatapp.domain.request.ReqMessageChatDto;
 import com.thinhtran.chatapp.domain.request.ReqMessageStatusDto;
+import com.thinhtran.chatapp.domain.request.ReqUpdateUserOnlineStatusDto;
 import com.thinhtran.chatapp.domain.response.ResMessageStatus;
 import com.thinhtran.chatapp.service.MessageService;
 import com.thinhtran.chatapp.service.MessageStatusService;
+import com.thinhtran.chatapp.service.UserService;
 import com.thinhtran.chatapp.util.constant.MessageStatusEnum;
 
 import jakarta.validation.Valid;
@@ -21,6 +23,7 @@ public class WebSocketController {
     private final SimpMessagingTemplate messagingTemplate;
     private final MessageService messageService;
     private final MessageStatusService messageStatusService;
+    private final UserService userService;
 
     @MessageMapping("/chat.group")
     public void handleGroupChat(@Payload @Valid ReqMessageChatDto message) {
@@ -109,6 +112,26 @@ public class WebSocketController {
 
         // DO NOT broadcast to conversation topic - only the sender should see that
         // others viewed their message
+    }
+
+    @MessageMapping("/user.status")
+    public void handleUserStatusUpdate(@Payload @Valid ReqUpdateUserOnlineStatusDto statusUpdate) {
+        if (statusUpdate == null || statusUpdate.getUserId() == null) {
+            throw new IllegalArgumentException("userId is required");
+        }
+
+        Long userId = statusUpdate.getUserId();
+        Boolean isOnline = statusUpdate.getIsOnline();
+
+        System.out.println("👤 [WebSocketController] User status update - userId: " + userId + ", isOnline: " + isOnline);
+
+        // Cập nhật status vào database
+        userService.updateUserOnlineStatus(userId, isOnline);
+
+        // Broadcast thay đổi status tới tất cả clients qua /topic/users
+        messagingTemplate.convertAndSend("/topic/users", statusUpdate);
+
+        System.out.println("   ✅ Broadcast user status update to /topic/users");
     }
 
 }
